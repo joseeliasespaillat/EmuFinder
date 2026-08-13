@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EmuFinder | Safe Emulators & ROMs Directory</title>
+
+  <!-- Google Fonts: Nunito for rounded, bubbly typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+
+  <!-- FontAwesome for Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+  <!-- Supabase JS Client (v2 CDN) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- Top Announcement / Trust Banner -->
+  <div class="safety-bar">
+    <i class="fa-solid fa-shield-halved"></i> 
+    <span><strong>100% Verified Safe:</strong> All directory listings undergo automated checksum & virus analysis.</span>
+  </div>
+
+  <!-- Navigation Header -->
+  <header class="navbar">
+    <div class="nav-container">
+      <a href="#" class="brand-logo">
+        <div class="logo-icon"><i class="fa-solid fa-gamepad"></i></div>
+        <span class="logo-text">Emu<strong>Finder</strong></span>
+      </a>
+
+      <!-- Search Bar -->
+      <div class="search-box">
+        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+        <input type="text" id="search-input" placeholder="Search safe emulators, games, consoles..." />
+        <button id="clear-search" class="clear-btn hidden"><i class="fa-solid fa-circle-xmark"></i></button>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="nav-actions">
+        <button class="bubbly-btn bookmark-toggle-btn" id="open-bookmarks">
+          <i class="fa-solid fa-bookmark"></i>
+          <span>Saved</span>
+          <span class="badge" id="bookmark-count">0</span>
+        </button>
+
+        <button class="bubbly-btn primary-btn" id="open-auth">
+          <i class="fa-solid fa-user"></i>
+          <span id="auth-btn-text">Login / Register</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="hero-content">
+      <span class="pill-tag"><i class="fa-solid fa-sparkles"></i> Beginner Friendly Directory</span>
+      <h1>Emulation Made Simple & Safe</h1>
+      <p>No popups, no shady mirrors, no viruses. Find verified emulators and homebrew ROMs with step-by-step setup guides.</p>
+    </div>
+  </section>
+
+  <!-- Main Directory Container -->
+  <main class="main-container">
+    <!-- Filter Bar -->
+    <section class="filter-section">
+      <div class="filter-group" id="type-filter">
+        <button class="filter-pill active" data-type="all">All Items</button>
+        <button class="filter-pill" data-type="emulator"><i class="fa-solid fa-microchip"></i> Emulators</button>
+        <button class="filter-pill" data-type="rom"><i class="fa-solid fa-compact-disc"></i> ROMs & Games</button>
+      </div>
+
+      <div class="filter-group system-scroll" id="platform-filter">
+        <button class="platform-pill active" data-platform="all">All Systems</button>
+        <button class="platform-pill" data-platform="GBA">GBA</button>
+        <button class="platform-pill" data-platform="SNES">SNES</button>
+        <button class="platform-pill" data-platform="N64">N64</button>
+        <button class="platform-pill" data-platform="PS1">PlayStation 1</button>
+        <button class="platform-pill" data-platform="GameCube">GameCube</button>
+        <button class="platform-pill" data-platform="NDS">Nintendo DS</button>
+      </div>
+    </section>
+
+    <!-- Results Meta -->
+    <div class="directory-meta">
+      <span id="result-count">Loading verified sources...</span>
+    </div>
+
+    <!-- Cards Directory Grid -->
+    <section class="cards-grid" id="directory-grid">
+      <!-- Injected via JavaScript -->
+    </section>
+  </main>
+
+  <!-- Bookmarks Drawer Side Panel -->
+  <aside class="drawer-overlay" id="drawer-overlay">
+    <div class="drawer">
+      <div class="drawer-header">
+        <h3><i class="fa-solid fa-heart"></i> My Saved Folder</h3>
+        <button class="close-btn" id="close-drawer"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="drawer-body" id="bookmarks-list">
+        <!-- Dynamically rendered bookmarked items -->
+      </div>
+    </div>
+  </aside>
+
+  <!-- Auth Modal (Login / Register via Supabase) -->
+  <div class="modal-overlay" id="auth-modal">
+    <div class="bubbly-modal">
+      <button class="close-btn modal-close" id="close-auth"><i class="fa-solid fa-xmark"></i></button>
+      
+      <div class="modal-tabs">
+        <button class="tab-btn active" id="tab-login">Login</button>
+        <button class="tab-btn" id="tab-register">Register</button>
+      </div>
+
+      <!-- Form Container -->
+      <form id="auth-form" class="auth-form">
+        <h2 id="modal-title">Welcome Back!</h2>
+        <p class="modal-subtitle">Save your favorite emulators & ROMs safely across devices with Supabase.</p>
+
+        <div class="input-group">
+          <label for="auth-email">Email Address</label>
+          <div class="input-wrapper">
+            <i class="fa-solid fa-envelope"></i>
+            <input type="email" id="auth-email" placeholder="gamer@retrohaven.com" required />
+          </div>
+        </div>
+
+        <div class="input-group">
+          <label for="auth-password">Password</label>
+          <div class="input-wrapper">
+            <i class="fa-solid fa-lock"></i>
+            <input type="password" id="auth-password" placeholder="••••••••" required minlength="6" />
+          </div>
+        </div>
+
+        <button type="submit" class="bubbly-btn primary-btn submit-btn" id="auth-submit-btn">Login</button>
+        
+  <button
+  type="button"
+  id="forgot-password-btn"
+  style="
+    background: none;
+    border: none;
+    color: var(--primary);
+    font-family: inherit;
+    font-weight: 800;
+    cursor: pointer;
+    margin-top: 4px;
+  "
+>
+  Forgot your password?
+</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Password Reset Modal -->
+<div class="modal-overlay" id="reset-password-modal">
+  <div class="bubbly-modal">
+
+    <button
+      class="close-btn modal-close"
+      id="close-reset-password"
+      type="button"
+    >
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+
+    <h2>Choose a New Password</h2>
+
+    <p class="modal-subtitle">
+      Enter a new password for your EmuFinder account.
+    </p>
+
+    <form id="reset-password-form" class="auth-form">
+
+      <div class="input-group">
+        <label for="new-password">
+          New Password
+        </label>
+
+        <div class="input-wrapper">
+          <i class="fa-solid fa-lock"></i>
+
+          <input
+            type="password"
+            id="new-password"
+            placeholder="••••••••"
+            required
+            minlength="6"
+          />
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label for="confirm-password">
+          Confirm New Password
+        </label>
+
+        <div class="input-wrapper">
+          <i class="fa-solid fa-lock"></i>
+
+          <input
+            type="password"
+            id="confirm-password"
+            placeholder="••••••••"
+            required
+            minlength="6"
+          />
+        </div>
+      </div>
+
+      <button
+        type="submit"
+        class="bubbly-btn primary-btn submit-btn"
+      >
+        Update Password
+      </button>
+
+    </form>
+
+  </div>
+</div>
+
+  <script src="script.js"></script>
+</body>
+</html>
