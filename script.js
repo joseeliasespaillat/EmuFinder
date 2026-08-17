@@ -90,37 +90,26 @@ const FALLBACK_DIRECTORY = [
     tags: ['PS1', 'Widescreen Hack']
   },
   {
-    id: 'rom-1',
-    name: 'Pokemon Unbound (ROM Hack)',
-    type: 'rom',
-    platform: 'GBA',
+    id: 'emu-5',
+    name: 'Dolphin',
+    type: 'emulator',
+    platform: 'GameCube',
     description:
-      'An extraordinary fan-made GBA RPG featuring custom story, QoL features, and Gen 1-8 Pokemon.',
-    safety_score: 'Verified Virus-Free',
+      'High-accuracy GameCube emulator with widescreen hacks and resolution scaling.',
+    safety_score: 'Verified 100% Safe',
     download_url: '#',
-    tags: ['GBA Patch', 'Community Favorite']
+    tags: ['GameCube', 'HD Graphics']
   },
   {
-    id: 'rom-2',
-    name: 'Super Mario World - Restored',
-    type: 'rom',
-    platform: 'SNES',
+    id: 'emu-6',
+    name: 'melonDS',
+    type: 'emulator',
+    platform: 'NDS',
     description:
-      'Verified clean dump homebrew patch adding modern widescreen & bug fixes.',
-    safety_score: 'Verified Virus-Free',
+      'Accurate Nintendo DS emulator with dual-screen layouts and microphone support.',
+    safety_score: 'Verified 100% Safe',
     download_url: '#',
-    tags: ['SNES', 'Clean Hash']
-  },
-  {
-    id: 'rom-3',
-    name: 'Celeste Classic 64',
-    type: 'rom',
-    platform: 'N64',
-    description:
-      'A charming 3D platformer homebrew game created for the Nintendo 64 system.',
-    safety_score: 'Verified Clean',
-    download_url: '#',
-    tags: ['N64 Homebrew', 'Indie']
+    tags: ['NDS', 'Dual Screen']
   }
 ];
 
@@ -128,7 +117,6 @@ const FALLBACK_DIRECTORY = [
 let directoryData = FALLBACK_DIRECTORY;
 let userBookmarks = [];
 let currentUser = null;
-let activeType = 'all';
 let activePlatform = 'all';
 let searchQuery = '';
 let authMode = 'login';
@@ -399,10 +387,6 @@ function renderDirectory() {
       item.platform || ''
     ).toLowerCase();
 
-    const matchesType =
-      activeType === 'all' ||
-      item.type === activeType;
-
     const matchesPlatform =
       activePlatform === 'all' ||
       item.platform === activePlatform;
@@ -413,7 +397,6 @@ function renderDirectory() {
       platform.includes(searchQuery);
 
     return (
-      matchesType &&
       matchesPlatform &&
       matchesSearch
     );
@@ -421,7 +404,7 @@ function renderDirectory() {
 
   if (resultCountText) {
     resultCountText.textContent =
-      `Showing ${filtered.length} verified safe source${
+      `Guarding ${filtered.length} verified safe source${
         filtered.length === 1 ? '' : 's'
       }`;
   }
@@ -435,18 +418,18 @@ function renderDirectory() {
         color: var(--text-muted);
       ">
         <i
-          class="fa-solid fa-ghost"
+          class="fa-solid fa-skull"
           style="
             font-size: 3rem;
             margin-bottom: 12px;
-            color: #cbd5e1;
+            color: var(--stone-light);
           "
         ></i>
 
         <h3>No verified sources match your search.</h3>
 
         <p>
-          Try searching for GBA, SNES, or resetting active filters.
+          Try searching for GBA, SNES, or resetting the active system tab.
         </p>
       </div>
     `;
@@ -470,12 +453,8 @@ function renderDirectory() {
           <div>
             <div class="card-header">
 
-              <span class="type-badge ${
-                item.type === 'emulator'
-                  ? 'type-emulator'
-                  : 'type-rom'
-              }">
-                ${item.type}
+              <span class="type-badge type-emulator">
+                emulator
               </span>
 
               <button
@@ -1014,47 +993,7 @@ function setupEventListeners() {
   }
 
   // ==========================================
-  // TYPE FILTERS
-  // ==========================================
-
-  const typeFilterContainer =
-    document.getElementById(
-      'type-filter'
-    );
-
-  if (typeFilterContainer) {
-    typeFilterContainer.addEventListener(
-      'click',
-      (event) => {
-        const btn =
-          event.target.closest(
-            '.filter-pill'
-          );
-
-        if (!btn) return;
-
-        document
-          .querySelectorAll(
-            '.filter-pill'
-          )
-          .forEach((button) =>
-            button.classList.remove(
-              'active'
-            )
-          );
-
-        btn.classList.add('active');
-
-        activeType =
-          btn.dataset.type;
-
-        renderDirectory();
-      }
-    );
-  }
-
-  // ==========================================
-  // PLATFORM FILTERS
+  // PLATFORM TABS (system selector)
   // ==========================================
 
   const platformFilterContainer =
@@ -1068,22 +1007,30 @@ function setupEventListeners() {
       (event) => {
         const btn =
           event.target.closest(
-            '.platform-pill'
+            '.platform-tab'
           );
 
         if (!btn) return;
 
         document
           .querySelectorAll(
-            '.platform-pill'
+            '.platform-tab'
           )
-          .forEach((button) =>
+          .forEach((button) => {
             button.classList.remove(
               'active'
-            )
-          );
+            );
+            button.setAttribute(
+              'aria-selected',
+              'false'
+            );
+          });
 
         btn.classList.add('active');
+        btn.setAttribute(
+          'aria-selected',
+          'true'
+        );
 
         activePlatform =
           btn.dataset.platform;
