@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>EmuFinder | Safe Emulators & ROMs Directory</title>
+  <title>EmuFinder | Safe Emulator Directory</title>
 
-  <!-- Google Fonts: Nunito for rounded, bubbly typography -->
+  <!-- Google Fonts: Nunito for body text, Press Start 2P for retro 64-bit castle headings -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Press+Start+2P&display=swap" rel="stylesheet">
 
   <!-- FontAwesome for Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
@@ -30,14 +30,14 @@
   <header class="navbar">
     <div class="nav-container">
       <a href="#" class="brand-logo">
-        <div class="logo-icon"><i class="fa-solid fa-gamepad"></i></div>
+        <div class="logo-icon"><i class="fa-solid fa-chess-rook"></i></div>
         <span class="logo-text">Emu<strong>Finder</strong></span>
       </a>
 
       <!-- Search Bar -->
       <div class="search-box">
         <i class="fa-solid fa-magnifying-glass search-icon"></i>
-        <input type="text" id="search-input" placeholder="Search safe emulators, games, consoles..." />
+        <input type="text" id="search-input" placeholder="Search the castle archives..." />
         <button id="clear-search" class="clear-btn hidden"><i class="fa-solid fa-circle-xmark"></i></button>
       </div>
 
@@ -60,9 +60,9 @@
   <!-- Hero Section -->
   <section class="hero-section">
     <div class="hero-content">
-      <span class="pill-tag"><i class="fa-solid fa-sparkles"></i> Beginner Friendly Directory</span>
-      <h1>Emulation Made Simple & Safe</h1>
-      <p>No popups, no shady mirrors, no viruses. Find verified emulators and homebrew ROMs with step-by-step setup guides.</p>
+      <span class="pill-tag"><i class="fa-solid fa-fire"></i> Beginner Friendly Directory</span>
+      <h1>Enter the Emulation Keep</h1>
+      <p>No popups, no shady mirrors, no viruses. Find verified emulators with step-by-step setup guides, safely locked behind the castle gates.</p>
     </div>
   </section>
 
@@ -70,26 +70,20 @@
   <main class="main-container">
     <!-- Filter Bar -->
     <section class="filter-section">
-      <div class="filter-group" id="type-filter">
-        <button class="filter-pill active" data-type="all">All Items</button>
-        <button class="filter-pill" data-type="emulator"><i class="fa-solid fa-microchip"></i> Emulators</button>
-        <button class="filter-pill" data-type="rom"><i class="fa-solid fa-compact-disc"></i> ROMs & Games</button>
-      </div>
-
-      <div class="filter-group system-scroll" id="platform-filter">
-        <button class="platform-pill active" data-platform="all">All Systems</button>
-        <button class="platform-pill" data-platform="GBA">GBA</button>
-        <button class="platform-pill" data-platform="SNES">SNES</button>
-        <button class="platform-pill" data-platform="N64">N64</button>
-        <button class="platform-pill" data-platform="PS1">PlayStation 1</button>
-        <button class="platform-pill" data-platform="GameCube">GameCube</button>
-        <button class="platform-pill" data-platform="NDS">Nintendo DS</button>
+      <div class="platform-tabs system-scroll" id="platform-filter" role="tablist" aria-label="Filter emulators by system">
+        <button class="platform-tab active" data-platform="all" role="tab" aria-selected="true"><i class="fa-solid fa-dungeon"></i> All Systems</button>
+        <button class="platform-tab" data-platform="GBA" role="tab" aria-selected="false">GBA</button>
+        <button class="platform-tab" data-platform="SNES" role="tab" aria-selected="false">SNES</button>
+        <button class="platform-tab" data-platform="N64" role="tab" aria-selected="false">N64</button>
+        <button class="platform-tab" data-platform="PS1" role="tab" aria-selected="false">PlayStation 1</button>
+        <button class="platform-tab" data-platform="GameCube" role="tab" aria-selected="false">GameCube</button>
+        <button class="platform-tab" data-platform="NDS" role="tab" aria-selected="false">Nintendo DS</button>
       </div>
     </section>
 
     <!-- Results Meta -->
     <div class="directory-meta">
-      <span id="result-count">Loading verified sources...</span>
+      <span id="result-count">Loading the vault...</span>
     </div>
 
     <!-- Cards Directory Grid -->
@@ -102,7 +96,7 @@
   <aside class="drawer-overlay" id="drawer-overlay">
     <div class="drawer">
       <div class="drawer-header">
-        <h3><i class="fa-solid fa-heart"></i> My Saved Folder</h3>
+        <h3><i class="fa-solid fa-shield-halved"></i> My Vault</h3>
         <button class="close-btn" id="close-drawer"><i class="fa-solid fa-xmark"></i></button>
       </div>
       <div class="drawer-body" id="bookmarks-list">
@@ -123,14 +117,14 @@
 
       <!-- Form Container -->
       <form id="auth-form" class="auth-form">
-        <h2 id="modal-title">Welcome Back!</h2>
-        <p class="modal-subtitle">Save your favorite emulators & ROMs safely across devices with Supabase.</p>
+        <h2 id="modal-title">The Gate Remembers You</h2>
+        <p class="modal-subtitle">Save your favorite emulators safely across devices.</p>
 
         <div class="input-group">
           <label for="auth-email">Email Address</label>
           <div class="input-wrapper">
             <i class="fa-solid fa-envelope"></i>
-            <input type="email" id="auth-email" placeholder="gamer@retrohaven.com" required />
+            <input type="email" id="auth-email" placeholder="gamer@emufinder.com" required />
           </div>
         </div>
 
@@ -175,7 +169,7 @@
       <i class="fa-solid fa-xmark"></i>
     </button>
 
-    <h2>Choose a New Password</h2>
+    <h2>Forge a New Password</h2>
 
     <p class="modal-subtitle">
       Enter a new password for your EmuFinder account.
