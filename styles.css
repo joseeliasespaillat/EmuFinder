@@ -294,7 +294,8 @@ body {
 /* Platform selector rebuilt as castle-banner tabs */
 .platform-tabs {
   display: flex;
-  gap: 4px;
+  width: 100%;
+  gap: 0;
   background: #1c130f;
   border: 2px solid var(--stone-light);
   border-radius: 14px;
@@ -314,9 +315,12 @@ body {
   cursor: pointer;
   white-space: nowrap;
   transition: var(--transition-bouncy);
-  display: inline-flex;
+  min-width: 0;
+  width: calc(100% / 7);
+  text-align: center;
+  display: flex;
   align-items: center;
-  gap: 6px;
+  justify-content: center;
 }
 
 .platform-tab:hover {
