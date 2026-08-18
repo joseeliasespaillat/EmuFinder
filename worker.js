@@ -2,7 +2,9 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
 
-    // URL scanner API
+    /*
+     * Submit a URL for scanning
+     */
     if (url.pathname === "/api/scan-url" && request.method === "POST") {
       try {
         const body = await request.json();
@@ -15,7 +17,6 @@ export default {
           );
         }
 
-        // Basic URL validation
         let parsedUrl;
 
         try {
@@ -34,11 +35,10 @@ export default {
           );
         }
 
-        // Send URL to VirusTotal
         const formData = new URLSearchParams();
         formData.set("url", targetUrl);
 
-        const vtResponse = await fetch(
+        const scanResponse = await fetch(
           "https://www.virustotal.com/api/v3/urls",
           {
             method: "POST",
@@ -50,35 +50,99 @@ export default {
           }
         );
 
-        const vtData = await vtResponse.json();
+        const scanData = await scanResponse.json();
 
-        if (!vtResponse.ok) {
+        if (!scanResponse.ok) {
           return Response.json(
             {
               error: "VirusTotal rejected the scan request.",
-              details: vtData
+              details: scanData
             },
-            { status: vtResponse.status }
+            { status: scanResponse.status }
           );
         }
 
         return Response.json({
           success: true,
-          analysisId: vtData?.data?.id || null
+          analysisId: scanData?.data?.id || null
         });
 
       } catch (error) {
         return Response.json(
           {
             error: "Scanner error.",
-            message: error instanceof Error ? error.message : "Unknown error"
+            message:
+              error instanceof Error
+                ? error.message
+                : "Unknown error"
           },
           { status: 500 }
         );
       }
     }
 
-    // Everything else goes to your existing website
+    /*
+     * Check the status of an existing VirusTotal analysis
+     */
+    if (url.pathname === "/api/scan-status" && request.method === "GET") {
+      try {
+        const analysisId = url.searchParams.get("id");
+
+        if (!analysisId) {
+          return Response.json(
+            { error: "Analysis ID is required." },
+            { status: 400 }
+          );
+        }
+
+        const analysisResponse = await fetch(
+          `https://www.virustotal.com/api/v3/analyses/${encodeURIComponent(analysisId)}`,
+          {
+            method: "GET",
+            headers: {
+              "x-apikey": env.VIRUSTOTAL_API_KEY
+            }
+          }
+        );
+
+        const analysisData = await analysisResponse.json();
+
+        if (!analysisResponse.ok) {
+          return Response.json(
+            {
+              error: "Unable to retrieve scan status.",
+              details: analysisData
+            },
+            { status: analysisResponse.status }
+          );
+        }
+
+        const attributes =
+          analysisData?.data?.attributes || {};
+
+        return Response.json({
+          success: true,
+          status: attributes.status || "unknown",
+          stats: attributes.stats || null
+        });
+
+      } catch (error) {
+        return Response.json(
+          {
+            error: "Status check failed.",
+            message:
+              error instanceof Error
+                ? error.message
+                : "Unknown error"
+          },
+          { status: 500 }
+        );
+      }
+    }
+
+    /*
+     * Everything else goes to the existing website.
+     */
     return env.ASSETS.fetch(request);
   }
 };
