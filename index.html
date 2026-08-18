@@ -80,7 +80,44 @@
         <button class="platform-tab" data-platform="NDS" role="tab" aria-selected="false">Nintendo DS</button>
       </div>
     </section>
+    <!-- URL Scanner Section -->
+    <section class="scanner-section" id="url-scanner">
+  <div class="scanner-header">
+    <div>
+      <span class="scanner-badge">
+        <i class="fa-solid fa-shield-halved"></i>
+        Security Scanner
+      </span>
 
+      <h2>Scan a Download Link</h2>
+
+      <p>
+        Check a download URL for known security threats before opening it.
+      </p>
+    </div>
+  </div>
+
+  <div class="scanner-form">
+    <input
+      type="url"
+      id="scan-url-input"
+      placeholder="https://example.com/download.zip"
+      autocomplete="off"
+    />
+
+    <button type="button" class="scanner-button" id="scan-url-button">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      Scan URL
+    </button>
+  </div>
+
+  <div
+    class="scanner-result hidden"
+    id="scanner-result"
+    aria-live="polite"
+  ></div>
+</section>
+    
     <!-- Results Meta -->
     <div class="directory-meta">
       <span id="result-count">Loading the vault...</span>
