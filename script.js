@@ -1413,3 +1413,241 @@ function setupEventListeners() {
     );
   }
 }
+
+// ==========================================
+// URL SECURITY SCANNER
+// ==========================================
+
+const scanUrlInput = document.getElementById('scan-url-input');
+const scanUrlButton = document.getElementById('scan-url-button');
+const scannerResult = document.getElementById('scanner-result');
+
+if (scanUrlButton && scanUrlInput && scannerResult) {
+  scanUrlButton.addEventListener('click', scanUrl);
+
+  scanUrlInput.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      scanUrl();
+    }
+  });
+}
+
+async function scanUrl() {
+  const targetUrl = scanUrlInput.value.trim();
+
+  if (!targetUrl) {
+    showScannerResult(
+      'error',
+      'Please enter a URL to scan.'
+    );
+    return;
+  }
+
+  let parsedUrl;
+
+  try {
+    parsedUrl = new URL(targetUrl);
+  } catch {
+    showScannerResult(
+      'error',
+      'Please enter a valid URL.'
+    );
+    return;
+  }
+
+  if (!['http:', 'https:'].includes(parsedUrl.protocol)) {
+    showScannerResult(
+      'error',
+      'Only HTTP and HTTPS URLs are allowed.'
+    );
+    return;
+  }
+
+  scanUrlButton.disabled = true;
+  scanUrlButton.innerHTML =
+    '<i class="fa-solid fa-spinner fa-spin"></i> Scanning...';
+
+  showScannerResult(
+    'loading',
+    'Submitting the URL to the security scanner...'
+  );
+
+  try {
+    // Submit URL to our Cloudflare Worker
+    const scanResponse = await fetch('/api/scan-url', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        url: targetUrl
+      })
+    });
+
+    const scanData = await scanResponse.json();
+
+    if (!scanResponse.ok || !scanData.success) {
+      throw new Error(
+        scanData.error || 'Unable to start the scan.'
+      );
+    }
+
+    if (!scanData.analysisId) {
+      throw new Error(
+        'The scanner did not return an analysis ID.'
+      );
+    }
+
+    showScannerResult(
+      'loading',
+      'Scan started. Waiting for security results...'
+    );
+
+    // Wait for VirusTotal to finish
+    const result = await pollScanStatus(
+      scanData.analysisId
+    );
+
+    displayScanResult(result);
+
+  } catch (error) {
+    console.error('URL scanner error:', error);
+
+    showScannerResult(
+      'error',
+      error.message || 'The scan failed.'
+    );
+  } finally {
+    scanUrlButton.disabled = false;
+
+    scanUrlButton.innerHTML =
+      '<i class="fa-solid fa-magnifying-glass"></i> Scan URL';
+  }
+}
+
+async function pollScanStatus(
+  analysisId,
+  attempts = 0
+) {
+  const maxAttempts = 20;
+
+  while (attempts < maxAttempts) {
+    const response = await fetch(
+      `/api/scan-status?id=${encodeURIComponent(
+        analysisId
+      )}`
+    );
+
+    const data = await response.json();
+
+    if (!response.ok || !data.success) {
+      throw new Error(
+        data.error || 'Unable to retrieve scan status.'
+      );
+    }
+
+    if (data.status === 'completed') {
+      return data;
+    }
+
+    // Wait 2 seconds before checking again
+    await new Promise((resolve) =>
+      setTimeout(resolve, 2000)
+    );
+
+    attempts++;
+  }
+
+  throw new Error(
+    'The scan is taking too long. Please try again.'
+  );
+}
+
+function displayScanResult(result) {
+  const stats = result.stats || {};
+
+  const malicious = Number(
+    stats.malicious || 0
+  );
+
+  const suspicious = Number(
+    stats.suspicious || 0
+  );
+
+  const harmless = Number(
+    stats.harmless || 0
+  );
+
+  const undetected = Number(
+    stats.undetected || 0
+  );
+
+  if (malicious > 0) {
+    showScannerResult(
+      'danger',
+      `
+        <strong>⚠️ THREAT DETECTED</strong>
+        <br><br>
+        ${malicious} security engine(s) flagged this URL as malicious.
+        <br>
+        Suspicious: ${suspicious}
+        <br>
+        Harmless: ${harmless}
+        <br>
+        Undetected: ${undetected}
+      `
+    );
+
+    return;
+  }
+
+  if (suspicious > 0) {
+    showScannerResult(
+      'warning',
+      `
+        <strong>⚠️ SUSPICIOUS URL</strong>
+        <br><br>
+        ${suspicious} security engine(s) flagged this URL as suspicious.
+        <br>
+        Malicious: ${malicious}
+        <br>
+        Harmless: ${harmless}
+        <br>
+        Undetected: ${undetected}
+      `
+    );
+
+    return;
+  }
+
+  showScannerResult(
+    'safe',
+    `
+      <strong>✅ NO THREATS DETECTED</strong>
+      <br><br>
+      Malicious: ${malicious}
+      <br>
+      Suspicious: ${suspicious}
+      <br>
+      Harmless: ${harmless}
+      <br>
+      Undetected: ${undetected}
+    `
+  );
+}
+
+function showScannerResult(type, message) {
+  scannerResult.classList.remove(
+    'hidden',
+    'safe',
+    'warning',
+    'danger',
+    'error',
+    'loading'
+  );
+
+  scannerResult.classList.add(type);
+
+  scannerResult.innerHTML = message;
+}
