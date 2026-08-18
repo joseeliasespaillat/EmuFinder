@@ -771,3 +771,33 @@ body {
     width: 100%;
   }
 }
+
+.scanner-result.safe {
+  border-color: var(--safe-green);
+  color: var(--safe-green);
+}
+
+.scanner-result.warning {
+  border-color: var(--warning-yellow);
+  color: var(--warning-yellow);
+}
+
+.scanner-result.danger {
+  border-color: #ff4d4d;
+  color: #ff6b6b;
+}
+
+.scanner-result.error {
+  border-color: #ff6b6b;
+  color: #ff6b6b;
+}
+
+.scanner-result.loading {
+  border-color: var(--secondary);
+  color: var(--secondary);
+}
+
+.scanner-button:disabled {
+  opacity: 0.7;
+  cursor: wait;
+}
