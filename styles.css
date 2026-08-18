@@ -95,6 +95,7 @@ body {
   align-items: center;
   justify-content: initial;
   gap: 0;
+  flex-wrap: wrap;
 }
 
 .brand-logo {
