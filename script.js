@@ -50,6 +50,7 @@ const FALLBACK_DIRECTORY = [
     name: 'VisualBoyAdvance-M',
     type: 'emulator',
     platform: 'GBA',
+    os: 'Windows',
     description:
       'The most trusted Game Boy Advance emulator featuring speed tweaks and save states.',
     safety_score: 'Verified 100% Safe',
@@ -61,6 +62,7 @@ const FALLBACK_DIRECTORY = [
     name: 'Snes9x',
     type: 'emulator',
     platform: 'SNES',
+    os: 'Windows',
     description:
       'Lightweight, beginner-friendly Super Nintendo emulator with plug-and-play controller support.',
     safety_score: 'Verified 100% Safe',
@@ -72,6 +74,7 @@ const FALLBACK_DIRECTORY = [
     name: 'Project64',
     type: 'emulator',
     platform: 'N64',
+    os: 'Windows',
     description:
       'Top rated Nintendo 64 emulator with high-definition resolution upscaling support.',
     safety_score: 'Verified 100% Safe',
@@ -83,6 +86,7 @@ const FALLBACK_DIRECTORY = [
     name: 'DuckStation',
     type: 'emulator',
     platform: 'PS1',
+    os: 'Mac',
     description:
       'Modern PlayStation 1 emulator focusing on playability, accuracy, and smooth enhancement.',
     safety_score: 'Verified 100% Safe',
@@ -94,6 +98,7 @@ const FALLBACK_DIRECTORY = [
     name: 'Dolphin',
     type: 'emulator',
     platform: 'GameCube',
+    os: 'Mac',
     description:
       'High-accuracy GameCube emulator with widescreen hacks and resolution scaling.',
     safety_score: 'Verified 100% Safe',
@@ -105,6 +110,7 @@ const FALLBACK_DIRECTORY = [
     name: 'melonDS',
     type: 'emulator',
     platform: 'NDS',
+    os: 'Windows',
     description:
       'Accurate Nintendo DS emulator with dual-screen layouts and microphone support.',
     safety_score: 'Verified 100% Safe',
@@ -116,11 +122,24 @@ const FALLBACK_DIRECTORY = [
     name: 'PCSX2',
     type: 'emulator',
     platform: 'PS2',
+    os: 'Windows',
     description:
       'Leading PlayStation 2 emulator with widescreen patches, upscaling, and broad game compatibility.',
     safety_score: 'Verified 100% Safe',
     download_url: '#',
     tags: ['PS2', 'HD Graphics']
+  },
+  {
+    id: 'emu-8',
+    name: 'AetherSX2',
+    type: 'emulator',
+    platform: 'PS2',
+    os: 'Android',
+    description:
+      'Mobile-focused PlayStation 2 emulator port bringing PCSX2-level accuracy to Android devices.',
+    safety_score: 'Verified 100% Safe',
+    download_url: '#',
+    tags: ['PS2', 'Mobile']
   }
 ];
 
@@ -129,8 +148,20 @@ let directoryData = FALLBACK_DIRECTORY;
 let userBookmarks = [];
 let currentUser = null;
 let activePlatform = 'all';
+let activeOS = 'all';
 let searchQuery = '';
 let authMode = 'login';
+
+// Maps an item's os value to a display icon + label for the card badge
+function getOsMeta(os) {
+  const map = {
+    Windows: { icon: 'fa-brands fa-windows', label: 'Windows' },
+    Mac: { icon: 'fa-brands fa-apple', label: 'Mac' },
+    Android: { icon: 'fa-brands fa-android', label: 'Android' }
+  };
+
+  return map[os] || { icon: 'fa-solid fa-desktop', label: os || 'Any OS' };
+}
 
 // DOM Element References
 let gridContainer;
@@ -402,6 +433,10 @@ function renderDirectory() {
       activePlatform === 'all' ||
       item.platform === activePlatform;
 
+    const matchesOS =
+      activeOS === 'all' ||
+      item.os === activeOS;
+
     const matchesSearch =
       name.includes(searchQuery) ||
       description.includes(searchQuery) ||
@@ -409,6 +444,7 @@ function renderDirectory() {
 
     return (
       matchesPlatform &&
+      matchesOS &&
       matchesSearch
     );
   });
@@ -459,14 +495,23 @@ function renderDirectory() {
           "\\'"
         );
 
+      const osMeta = getOsMeta(item.os);
+
       return `
         <div class="card">
           <div>
             <div class="card-header">
 
-              <span class="type-badge type-emulator">
-                emulator
-              </span>
+              <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+                <span class="type-badge type-emulator">
+                  emulator
+                </span>
+
+                <span style="display:inline-flex; align-items:center; gap:4px; font-size:0.7rem; font-weight:800; padding:4px 10px; border-radius:8px; background-color:rgba(255,207,77,0.14); color:var(--secondary); border:1px solid rgba(255,207,77,0.3);">
+                  <i class="${osMeta.icon}"></i>
+                  ${osMeta.label}
+                </span>
+              </div>
 
               <button
                 class="bookmark-btn ${
@@ -1023,7 +1068,7 @@ function setupEventListeners() {
 
         if (!btn) return;
 
-        document
+        platformFilterContainer
           .querySelectorAll(
             '.platform-tab'
           )
@@ -1045,6 +1090,53 @@ function setupEventListeners() {
 
         activePlatform =
           btn.dataset.platform;
+
+        renderDirectory();
+      }
+    );
+  }
+
+  // ==========================================
+  // OS TABS (Windows / Mac / Android selector)
+  // ==========================================
+
+  const osFilterContainer =
+    document.getElementById(
+      'os-filter'
+    );
+
+  if (osFilterContainer) {
+    osFilterContainer.addEventListener(
+      'click',
+      (event) => {
+        const btn =
+          event.target.closest(
+            '.platform-tab'
+          );
+
+        if (!btn) return;
+
+        osFilterContainer
+          .querySelectorAll(
+            '.platform-tab'
+          )
+          .forEach((button) => {
+            button.classList.remove(
+              'active'
+            );
+            button.setAttribute(
+              'aria-selected',
+              'false'
+            );
+          });
+
+        btn.classList.add('active');
+        btn.setAttribute(
+          'aria-selected',
+          'true'
+        );
+
+        activeOS = btn.dataset.os;
 
         renderDirectory();
       }
