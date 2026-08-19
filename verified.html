@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Verified | EmuFinder</title>
+
+  <!-- Google Fonts: Nunito for body text, Press Start 2P for retro 64-bit castle headings -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Press+Start+2P&display=swap" rel="stylesheet">
+
+  <!-- FontAwesome for Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+  <link rel="stylesheet" href="styles.css" />
+
+  <style>
+    /* Page-specific styles for the verification result card */
+    .verify-wrap {
+      min-height: calc(100vh - 130px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+    }
+
+    .verify-card {
+      background: linear-gradient(160deg, #2f2018, #201510);
+      padding: 44px 36px;
+      border-radius: var(--border-radius-modal);
+      width: 100%;
+      max-width: 460px;
+      text-align: center;
+      box-shadow: var(--shadow-hover), 0 0 0 4px var(--stone-black), 0 0 0 6px var(--stone-light);
+      border-top: 4px solid var(--secondary);
+    }
+
+    .verify-icon {
+      width: 84px;
+      height: 84px;
+      margin: 0 auto 22px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.1rem;
+      background: var(--safe-green-bg);
+      color: var(--safe-green);
+      border: 3px solid rgba(126, 224, 139, 0.35);
+      box-shadow: 0 0 24px rgba(126, 224, 139, 0.35);
+    }
+
+    .verify-icon.error {
+      background: rgba(255, 107, 107, 0.12);
+      color: #ff6b6b;
+      border-color: rgba(255, 107, 107, 0.35);
+      box-shadow: 0 0 24px rgba(255, 107, 107, 0.25);
+    }
+
+    .verify-card h1 {
+      font-family: var(--font-display);
+      font-size: 1.15rem;
+      line-height: 1.6;
+      color: var(--secondary);
+      text-shadow: 0 2px 0 rgba(0,0,0,0.4);
+      margin-bottom: 14px;
+    }
+
+    .verify-card p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-bottom: 26px;
+    }
+
+    .verify-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .verify-note {
+      margin-top: 18px;
+      font-size: 0.8rem;
+      color: #8a6a54;
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Announcement / Trust Banner -->
+  <div class="safety-bar">
+    <i class="fa-solid fa-shield-halved"></i>
+    <span><strong>100% Verified Safe:</strong> All directory listings undergo automated checksum & virus analysis.</span>
+  </div>
+
+  <!-- Navigation Header -->
+  <header class="navbar">
+    <div class="nav-container">
+      <a href="/" class="brand-logo">
+        <div class="logo-icon"><i class="fa-solid fa-chess-rook"></i></div>
+        <span class="logo-text">Emu<strong>Finder</strong></span>
+      </a>
+    </div>
+  </header>
+
+  <!-- Verification Result -->
+  <div class="verify-wrap">
+    <div class="verify-card" id="verify-card">
+      <div class="verify-icon" id="verify-icon">
+        <i class="fa-solid fa-shield-halved"></i>
+      </div>
+      <h2 id="verify-title">Checking the Gate Seal...</h2>
+      <p id="verify-message">Hang tight while we confirm your account.</p>
+
+      <div class="verify-actions">
+        <a href="/" class="bubbly-btn primary-btn submit-btn" id="verify-cta" style="width:100%; justify-content:center; text-decoration:none;">
+          <i class="fa-solid fa-dungeon"></i>
+          <span>Enter the Keep</span>
+        </a>
+      </div>
+
+      <p class="verify-note" id="verify-note"></p>
+    </div>
+  </div>
+
+  <!-- Supabase JS Client (v2 CDN) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    // Match these to the credentials used in script.js
+    const SUPABASE_URL = "https://mlkbwrhkiqqupnetostt.supabase.co";
+    const SUPABASE_ANON_KEY = "sb_publishable_Q3u_yzIndQayWSHKHpg91Q_40A54ZCs";
+
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const iconEl = document.getElementById("verify-icon");
+    const titleEl = document.getElementById("verify-title");
+    const messageEl = document.getElementById("verify-message");
+    const noteEl = document.getElementById("verify-note");
+    const ctaEl = document.getElementById("verify-cta");
+
+    function showSuccess() {
+      titleEl.textContent = "The Gate Has Opened";
+      messageEl.textContent = "Your email is confirmed and your account is ready. You're now logged in.";
+      iconEl.innerHTML = '<i class="fa-solid fa-check"></i>';
+      ctaEl.innerHTML = '<i class="fa-solid fa-dungeon"></i><span>Enter the Keep</span>';
+    }
+
+    function showError(detail) {
+      titleEl.textContent = "The Seal Didn't Hold";
+      messageEl.textContent = "This confirmation link is invalid or has expired. Please try registering again or request a new link.";
+      iconEl.classList.add("error");
+      iconEl.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i>';
+      ctaEl.innerHTML = '<i class="fa-solid fa-arrow-left"></i><span>Back to EmuFinder</span>';
+      if (detail) noteEl.textContent = detail;
+    }
+
+    (async () => {
+      // Supabase appends tokens/errors as a URL hash fragment, e.g.
+      // #access_token=...&type=signup  or  #error=...&error_description=...
+      const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+      const queryParams = new URLSearchParams(window.location.search);
+
+      const errorDescription =
+        hashParams.get("error_description") || queryParams.get("error_description");
+
+      if (errorDescription) {
+        showError(decodeURIComponent(errorDescription.replace(/\+/g, " ")));
+        return;
+      }
+
+      // If Supabase already established a session from the confirmation link,
+      // getSession() will pick it up automatically.
+      const { data, error } = await supabase.auth.getSession();
+
+      if (error || !data?.session) {
+        showError();
+        return;
+      }
+
+      showSuccess();
+
+      // Clean up the token fragment from the visible URL
+      history.replaceState(null, "", window.location.pathname);
+    })();
+  </script>
+</body>
+</html>
