@@ -317,7 +317,7 @@ body {
   white-space: nowrap;
   transition: var(--transition-bouncy);
   min-width: 0;
-  width: calc(100% / 7);
+  width: calc(100% / 8);
   text-align: center;
   flex: 1 1 0;
   display: flex;
@@ -583,6 +583,7 @@ body {
   background: #1c130f;
   padding: 4px;
   border-radius: var(--border-radius-pill);
+  margin-top: 26px;
   margin-bottom: 20px;
   border: 2px solid var(--stone-light);
 }

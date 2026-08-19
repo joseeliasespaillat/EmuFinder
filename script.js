@@ -110,6 +110,17 @@ const FALLBACK_DIRECTORY = [
     safety_score: 'Verified 100% Safe',
     download_url: '#',
     tags: ['NDS', 'Dual Screen']
+  },
+  {
+    id: 'emu-7',
+    name: 'PCSX2',
+    type: 'emulator',
+    platform: 'PS2',
+    description:
+      'Leading PlayStation 2 emulator with widescreen patches, upscaling, and broad game compatibility.',
+    safety_score: 'Verified 100% Safe',
+    download_url: '#',
+    tags: ['PS2', 'HD Graphics']
   }
 ];
 
