@@ -497,6 +497,10 @@ function renderDirectory() {
 
       const osMeta = getOsMeta(item.os);
 
+      const safetyText = item.safety_score || 'Verified Safe';
+      const isInactive =
+        String(safetyText).trim().toLowerCase() === 'inactive';
+
       return `
         <div class="card">
           <div>
@@ -507,7 +511,7 @@ function renderDirectory() {
                   emulator
                 </span>
 
-                <span style="display:inline-flex; align-items:center; gap:4px; font-size:0.7rem; font-weight:800; padding:4px 10px; border-radius:8px; background-color:rgba(255,207,77,0.14); color:var(--secondary); border:1px solid rgba(255,207,77,0.3);">
+                <span class="os-badge ${item.os === 'Mac' ? 'os-mac' : ''}">
                   <i class="${osMeta.icon}"></i>
                   ${osMeta.label}
                 </span>
@@ -541,12 +545,13 @@ function renderDirectory() {
 
             <div class="card-tags">
 
-              <span class="safety-tag">
-                <i class="fa-solid fa-circle-check"></i>
-                ${
-                  item.safety_score ||
-                  'Verified Safe'
-                }
+              <span class="safety-tag ${isInactive ? 'inactive' : ''}">
+                <i class="fa-solid ${
+                  isInactive
+                    ? 'fa-circle-xmark'
+                    : 'fa-circle-check'
+                }"></i>
+                ${safetyText}
               </span>
 
               ${(item.tags || [])
