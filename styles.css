@@ -14,6 +14,10 @@
   --safe-green: #7ee08b;
   --safe-green-bg: rgba(126, 224, 139, 0.12);
   --warning-yellow: #ffcf4d;
+  --danger-red: #ff6b6b;
+  --danger-red-bg: rgba(255, 107, 107, 0.12);
+  --mac-blue: #6ec8ff;
+  --mac-blue-bg: rgba(110, 200, 255, 0.14);
 
   --stone-black: #17110f;       /* deepest shadow */
   --stone-dark: #241a16;        /* base background stone */
@@ -440,6 +444,30 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 4px;
+}
+
+.safety-tag.inactive {
+  background-color: var(--danger-red-bg);
+  color: var(--danger-red);
+}
+
+.os-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.7rem;
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: 8px;
+  background-color: rgba(255, 207, 77, 0.14);
+  color: var(--secondary);
+  border: 1px solid rgba(255, 207, 77, 0.3);
+}
+
+.os-badge.os-mac {
+  background-color: var(--mac-blue-bg);
+  color: var(--mac-blue);
+  border: 1px solid rgba(110, 200, 255, 0.3);
 }
 
 .card-footer {
